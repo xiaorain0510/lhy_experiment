@@ -1,3 +1,4 @@
+项目说明：
 这是《面向医疗信息抽取的个性化特征选择方法》毕业论文的相关代码说明。
 实验使用的数据集来源于CLEF eHealth 2016 Task 1，叫做NICTA Synthetic Nursing Handover Data. 
 数据集及任务的相关说明可以参见：https://sites.google.com/site/clefehealth2016/task-1
@@ -15,3 +16,9 @@ CRF++的安装使用可以参见：https://taku910.github.io/crfpp/
 
 4. 在实现论文的方法的基础上，我们还开发了一个原型系统。通过该原型可以上传英文文本，然后返回抽取后的结构化的医疗移交表格。
 
+代码说明：
+代码分为三大部分，分别为Code1,GA和NERDemo。
+其中Code1包含的代码主要是进行特征的生成，解析，CRF模型的训练，包含上述流程的1,2两步。
+GA为MATLAB代码，主要实现了自然选择算法，输入为第1,2两步的输出结果。
+NERDemo为根据方法写的一个在线的医疗移交表格自动填充原型系统。
+各部分代码的使用说明参见各代码文件夹的readme。
