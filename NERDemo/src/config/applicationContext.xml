@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd"
+	>
+
+	<!-- 定义数据源 Bean，使用C3P0数据源实现 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<!-- 指定连接数据库的驱动 -->
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<!-- 指定连接数据库的 URL jdbc:mysql://222.204.232.141:3306/saiweisitest?characterEncoding=UTF-8-->
+		<!-- jdbc:mysql:///crowd -->
+		<property name="jdbcUrl" value="jdbc:mysql:///mydemo" />
+		<!-- 指定连接数据库的用户名 -->
+		<property name="user" value="root" />
+		<!-- 指定连接数据库的密码 icacrowd-->
+		<property name="password" value="icacrowd" />
+		<!-- 指定连接数据库连接池的最大连接数 -->
+		<property name="maxPoolSize" value="1000" />
+		<!-- 指定连接数据库连接池的最小连接数 -->
+		<property name="minPoolSize" value="20" />
+		<!-- 指定连接数据库连接池的初始化连接数 -->
+		<property name="initialPoolSize" value="50" />
+		<!-- 指定连接数据库连接池的连接的最大空闲时间 -->
+		<property name="maxIdleTime" value="20" />
+	</bean>
+
+	<!-- 定义 Hibernate 的SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<!-- 以下用来列出所有的PO映射文件 -->
+				<value>identifier/domain/UserInfo.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<!-- 设置 Hibernate 属性 -->
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+				hibernate.hbm2ddl.auto = update
+				hibernate.show_sql=true
+				hibernate.format_sql=true
+			</value>
+		</property>
+	</bean>
+	<!-- 调度器 -->
+	
+	
+	<!-- 定义 DAO Bean -->
+	<bean id="userDAO" class="identifier.dao.UserDAOImpl">
+	    <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	
+	<!-- 配置一个业务逻辑组件  -->
+	<bean id="userService" class="identifier.service.UserServiceImpl">
+	    <property name="userDAO" ref="userDAO"/>
+	</bean>
+	
+	
+	<!-- 让Spring 管理的Action实例 -->
+	<bean id="userAction" class="identifier.action.UserAction" scope="prototype">
+		<!-- 依赖注入业务逻辑组件 -->
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	
+	<!-- 配置 Hibernate 的局部事务管理器，使用HibernateTransactionManager 类 -->
+	<!-- 该类实现 PlatformTransactionManager 接口，是针对Hibernate的特定实现 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<!-- 配置 HibernateTransactionManager 时需要依注入SessionFactory的引用  -->
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- 配置事务增强处理Bean，指定事务管理器 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<!-- 用于配置详细的事务语义 -->
+		<tx:attributes>
+			<!-- 所有已'get'开头的方法是read-only的 -->
+			<tx:method name="get*" read-only="true"/>
+			<!-- 其他方法是用默认的事务设置 -->
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!-- 配置一个切入点 -->
+		<aop:pointcut expression="bean(userService)" id="userPiontcut"/>
+		<!-- 指定在userPiontcut切入点应用txAdvice 事务增强处理 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="userPiontcut"/>
+	</aop:config>
+	    
+    
+
+</beans>
