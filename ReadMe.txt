@@ -1,8 +1,13 @@
 项目说明：
+Descriptions:
 这是《面向医疗信息抽取的个性化特征选择方法》毕业论文的相关代码说明。
+This is code illustrations for paper "Term-based Personalization for Feature Selection in Clinical Handover Form Auto-filling".
 实验使用的数据集来源于CLEF eHealth 2016 Task 1，叫做NICTA Synthetic Nursing Handover Data. 
+Dataset used in experiment is from CLEF eHealth 2016 Task 1, called NICTA Synthetic Nursing Handover Data.
 数据集及任务的相关说明可以参见：https://sites.google.com/site/clefehealth2016/task-1
+More description for the dataset and the task can be found in "https://sites.google.com/site/clefehealth2016/task-1".
 数据集的下载地址为：https://sites.google.com/site/clefehealth/datasets
+Downloading address for this dataset is "https://sites.google.com/site/clefehealth/datasets".
 论文的方法流程为：
 1. 为原始数据生成不同数量的特征，主要是使用了两种不同的外部数据，分别为Stanford CoreNLP和MetaMap
 CoreNLP的版本为3.6,MetaMap的版本为2013V2。
